@@ -1,14 +1,15 @@
-import { FlatList, Modal, SafeAreaView, Text, TouchableOpacity, View } from "react-native"
-import {  useRef, useState } from "react"
+import { FlatList, Modal, Pressable, Text, TouchableOpacity, View } from "react-native"
+import { useRef, useState } from "react"
 import BottomSheet from '@gorhom/bottom-sheet'
 
 import styles from "./styles"
 
-const Select = ({ label, pickerStyles, options }) => {
+const Select = ({ label, options }) => {
     const [open, setOpen] = useState(false)
     const [selectedOption, setSelectedOption] = useState(null)
 
-    const sheetRef = useRef()
+    const backdropRef = useRef(null)
+    const sheetRef = useRef(null)
 
     const handleOpen = () => {
         sheetRef.current?.present()
@@ -22,6 +23,12 @@ const Select = ({ label, pickerStyles, options }) => {
     const handleOptionPress = (option) => {
         setSelectedOption(option)
         sheetRef.current?.close()
+    }
+
+    const handlePressableClick = (e) => {
+        if (e.target === backdropRef.current) {
+            sheetRef.current?.close()
+        }
     }
 
     const renderItem = ({ item }) => (
@@ -40,23 +47,25 @@ const Select = ({ label, pickerStyles, options }) => {
                 <View style={styles.downArrow(open)}></View>
             </TouchableOpacity>
             <Modal transparent visible={open}>
-                <View style={styles.backdrop}>
-                    <BottomSheet
-                        style={styles.sheet}
-                        enablePanDownToClose
-                        snapPoints={['60%']}
-                        ref={sheetRef}
-                        onClose={handleBottomSheetClose}
-                    >
-                        <FlatList
-                            data={options}
-                            renderItem={renderItem}
-                            keyExtractor={(item) => (item.label + Math.random(1, 1000) + Date.now()).toString()}
-                            contentContainerStyle={styles.flatListContainer}
-                            style={styles.flatListStyle}
-                        />
-                    </BottomSheet>
-                </View>
+                <Pressable onPress={handlePressableClick} style={{ flex: 1 }}>
+                    <View ref={backdropRef} style={styles.backdrop}>
+                        <BottomSheet
+                            style={styles.sheet}
+                            enablePanDownToClose
+                            snapPoints={['60%']}
+                            ref={sheetRef}
+                            onClose={handleBottomSheetClose}
+                        >
+                            <FlatList
+                                data={options}
+                                renderItem={renderItem}
+                                keyExtractor={(item) => (item.label + Math.random(1, 1000) + Date.now()).toString()}
+                                contentContainerStyle={styles.flatListContainer}
+                                style={styles.flatListStyle}
+                            />
+                        </BottomSheet>
+                    </View>
+                </Pressable>
             </Modal>
         </View>
     )

@@ -13,13 +13,8 @@ const defaultValue = {
     product_delar_price: '',
     product_selling_price: '',
     product_thumbnail: null,
-    product_images: []
-}
-
-const AddProduct = () => {
-    const [data, mergeData] = useMergeState(defaultValue)
-    const [loading, setLoading] = useState(false)
-    const [items, setItems] = useState([
+    product_images: [],
+    items: [
         {
             label: 'Mobile Phones',
             value: 'mobile-phones'
@@ -30,7 +25,12 @@ const AddProduct = () => {
             label: 'AC',
             value: 'ac'
         }
-    ])
+    ]
+}
+
+const AddProduct = () => {
+    const [state, mergeState] = useMergeState(defaultValue)
+    const [loading, setLoading] = useState(false)
 
     const handleMultipleImages = images => {
         const imgs = images.assets
@@ -38,17 +38,17 @@ const AddProduct = () => {
         imgs.forEach(img => {
             imagesArray.push(img.uri)
         })
-        mergeData({ product_images: [...data.product_images, ...imagesArray] })
+        mergeState({ product_images: [...state.product_images, ...imagesArray] })
 
     }
 
     const handleImageDelete = (index) => {
-        const images = data.product_images.filter((image, productIndex) => productIndex !== index)
-        mergeData({ product_images: images })
+        const images = state.product_images.filter((image, productIndex) => productIndex !== index)
+        mergeState({ product_images: images })
     }
 
     const handleFormSubmit = () => {
-        console.log(data)
+        console.log(state)
         setLoading(true)
         setTimeout(() => { setLoading(false) }, 5000)
     }
@@ -86,8 +86,8 @@ const AddProduct = () => {
                         gap: 20
                     }}>
                         <Input
-                            onChangeText={t => mergeData({ product_id: t })}
-                            value={data.product_id}
+                            onChangeText={t => mergeState({ product_id: t })}
+                            value={state.product_id}
                             label={'Product Id'}
                             placeholder={'Enter or scan product id'}
                             keyboardType="number-pad"
@@ -108,49 +108,49 @@ const AddProduct = () => {
                                 }}
                                 disabled={loading}
                             />
-                        )} onScanComplete={t => mergeData({ product_id: t })} />
+                        )} onScanComplete={t => mergeState({ product_id: t })} />
                     </View>
                     <Input
-                        onChangeText={t => mergeData({ product_name: t })}
-                        value={data.product_name}
+                        onChangeText={t => mergeState({ product_name: t })}
+                        value={state.product_name}
                         label={'Product Name'}
                         placeholder={'Enter product name'}
                         editable={!loading}
                     />
                     <Select
                         label={'Select Category'}
-                        options={items}
+                        options={state.items}
                         placeholder={'Select'}
-                        value={data.product_category}
-                        setValue={v => mergeData({ product_category: v() })}
+                        value={state.product_category}
+                        setValue={v => mergeState({ product_category: v() })}
                         disabled={loading}
                     />
                     <Input
-                        onChangeText={t => mergeData({ product_delar_price: t })}
-                        value={data.product_delar_price}
+                        onChangeText={t => mergeState({ product_delar_price: t })}
+                        value={state.product_delar_price}
                         label={'Dealer Price'}
                         placeholder={'Enter dealer price'}
                         keyboardType="numeric"
                         editable={!loading}
                     />
                     <Input
-                        onChangeText={t => mergeData({ product_selling_price: t })}
-                        value={data.product_selling_price}
+                        onChangeText={t => mergeState({ product_selling_price: t })}
+                        value={state.product_selling_price}
                         label={'Customer Price'}
                         placeholder={'Enter customer price'}
                         keyboardType="numeric"
                         editable={!loading}
                     />
                     <View style={{
-                        borderWidth: data.product_thumbnail ? 1 : 0,
-                        borderStyle: data.product_thumbnail ? 'dashed' : 'solid',
+                        borderWidth: state.product_thumbnail ? 1 : 0,
+                        borderStyle: state.product_thumbnail ? 'dashed' : 'solid',
                         borderRadius: 8,
                         borderColor: COLOR.gray2,
-                        padding: data.product_thumbnail ? SIZE.large : 0,
+                        padding: state.product_thumbnail ? SIZE.large : 0,
                         gap: 20,
                         overflow: 'hidden'
                     }}>
-                        {data.product_thumbnail && (
+                        {state.product_thumbnail && (
                             <View style={{
                                 height: 70,
                                 gap: 10
@@ -159,20 +159,20 @@ const AddProduct = () => {
                                 <ActionButton
                                     primary
                                     text={'Delete Thubmnail'}
-                                    onPress={() => mergeData({ product_thumbnail: '' })}
+                                    onPress={() => mergeState({ product_thumbnail: '' })}
                                     btnStyle={{
                                         justifyContent: 'center'
                                     }}
                                 />
                             </View>
                         )}
-                        {!data.product_thumbnail && <ImagePickers
+                        {!state.product_thumbnail && <ImagePickers
                             label={'Select Thumbnail Image'}
                             text={'Click to select an image'}
-                            getSelectedImage={image => mergeData({ product_thumbnail: image.assets[0].uri })}
+                            getSelectedImage={image => mergeState({ product_thumbnail: image.assets[0].uri })}
                         />}
-                        {data.product_thumbnail && <Image
-                            source={{ uri: data.product_thumbnail }}
+                        {state.product_thumbnail && <Image
+                            source={{ uri: state.product_thumbnail }}
                             resizeMode="contain"
                             style={{
                                 height: 100,
@@ -192,7 +192,7 @@ const AddProduct = () => {
                             getSelectedImage={handleMultipleImages}
                         />
                     </View>
-                    {data.product_images.length > 0 && <View style={{
+                    {state.product_images.length > 0 && <View style={{
                         flex: 1,
                         flexDirection: 'row',
                         flexWrap: 'wrap',
@@ -203,7 +203,7 @@ const AddProduct = () => {
                         borderRadius: 8,
                         borderColor: COLOR.gray2
                     }}>
-                        {data.product_images?.map((image, index) => (
+                        {state.product_images?.map((image, index) => (
                             <View
                                 key={index + Date.now()}
                                 style={{
